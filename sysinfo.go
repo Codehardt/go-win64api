@@ -1,4 +1,4 @@
-// +build windows,amd64
+// +build windows
 
 package winapi
 
@@ -13,7 +13,7 @@ import (
 	ole "github.com/go-ole/go-ole"
 	"github.com/go-ole/go-ole/oleutil"
 
-	so "github.com/iamacarpet/go-win64api/shared"
+	so "github.com/Codehardt/go-win64api/shared"
 )
 
 func GetSystemProfile() (so.Hardware, so.OperatingSystem, so.Memory, []so.Disk, []so.Network, error) {

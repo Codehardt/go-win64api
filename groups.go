@@ -1,4 +1,4 @@
-// +build windows,amd64
+// +build windows
 
 package winapi
 
@@ -9,7 +9,7 @@ import (
 	"syscall"
 	"unsafe"
 
-	so "github.com/iamacarpet/go-win64api/shared"
+	so "github.com/Codehardt/go-win64api/shared"
 )
 
 var (

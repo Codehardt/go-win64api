@@ -1,4 +1,4 @@
-// +build windows,amd64
+// +build windows
 
 package winapi
 
@@ -8,7 +8,7 @@ import (
 	"time"
 	"unsafe"
 
-	so "github.com/iamacarpet/go-win64api/shared"
+	so "github.com/Codehardt/go-win64api/shared"
 	"golang.org/x/sys/windows"
 	"golang.org/x/sys/windows/svc"
 	"golang.org/x/sys/windows/svc/mgr"
