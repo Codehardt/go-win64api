@@ -24,14 +24,14 @@ type SHARE_INFO_2 struct {
 	Shi2_passwd       *uint16
 }
 
-func ListNetworkShares() ([]NetworkShare, error) {
+func ListNetworkShares() ([]so.NetworkShare, error) {
 	var (
 		dataPointer  uintptr
 		resumeHandle uintptr
 		entriesRead  uint32
 		entriesTotal uint32
 		sizeTest     SHARE_INFO_2
-		retVal       = make([]NetworkShare, 0)
+		retVal       = make([]so.NetworkShare, 0)
 	)
 	ret, _, _ := shNetShareEnum.Call(
 		uintptr(0),
