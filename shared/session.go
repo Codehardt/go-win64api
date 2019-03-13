@@ -21,6 +21,16 @@ type SessionDetails struct {
 	DnsDomainName string    `json:"dnsDomainName"`
 }
 
+type NetworkSession struct {
+	Clientname string
+	Username   string
+	NumOpens   uint32
+	Time       time.Duration
+	IdleTime   time.Duration
+	UserFlags  uint32
+	ClientType string
+}
+
 func (s *SessionDetails) FullUser() string {
 	return fmt.Sprintf("%s\\%s", s.Domain, s.Username)
 }

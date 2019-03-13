@@ -20,6 +20,7 @@ var (
 	sessLsaFreeReturnBuffer       = modSecur32.NewProc("LsaFreeReturnBuffer")
 	sessLsaEnumerateLogonSessions = modSecur32.NewProc("LsaEnumerateLogonSessions")
 	sessLsaGetLogonSessionData    = modSecur32.NewProc("LsaGetLogonSessionData")
+	sessNetSessionEnum            = modNetapi32.NewProc("NetSessionEnum")
 )
 
 type LUID struct {
@@ -46,6 +47,61 @@ type LSA_UNICODE_STRING struct {
 	Length        uint16
 	MaximumLength uint16
 	buffer        uintptr
+}
+
+type SESSION_INFO_2 struct {
+	Sesi2_cname       *uint16
+	Sesi2_username    *uint16
+	Sesi2_num_opens   uint32
+	Sesi2_time        uint32
+	Sesi2_idle_time   uint32
+	Sesi2_user_flags  uint32
+	Sesi2_cltype_name *uint16
+}
+
+func ListNetworkSessions() ([]so.NetworkSession, error) {
+	var (
+		dataPointer  uintptr
+		resumeHandle uintptr
+		entriesRead  uint32
+		entriesTotal uint32
+		sizeTest     SESSION_INFO_2
+		retVal       = make([]so.NetworkSession, 0)
+	)
+	ret, _, _ := sessNetSessionEnum.Call(
+		uintptr(0),
+		uintptr(0),
+		uintptr(0),
+		uintptr(uint32(2)), // SESSION_INFO_2
+		uintptr(unsafe.Pointer(&dataPointer)),
+		uintptr(uint32(USER_MAX_PREFERRED_LENGTH)),
+		uintptr(unsafe.Pointer(&entriesRead)),
+		uintptr(unsafe.Pointer(&entriesTotal)),
+		uintptr(unsafe.Pointer(&resumeHandle)),
+	)
+	if ret != NET_API_STATUS_NERR_Success {
+		return nil, fmt.Errorf("error fetching network sessions")
+	} else if dataPointer == uintptr(0) {
+		return nil, fmt.Errorf("null pointer while fetching entry")
+	}
+	var iter = dataPointer
+	for i := uint32(0); i < entriesRead; i++ {
+		var data = (*SESSION_INFO_2)(unsafe.Pointer(iter))
+		sd := so.NetworkSession{
+			Clientname: UTF16toString(data.Shi2_cname),
+			Username: UTF16toString(data.Sesi2_username),
+			NumOpens: data.Sesi2_num_opens,
+			Time: time.Duration(data.Sesi2_time) * time.Second,
+			IdleTime: time.Duration(data.Sesi2_idle_time) * time.Second,
+			UserFlags: data.Sesi2_user_flags,
+			ClientType: UTF16toString(data.Sesi2_cltype_name),
+			*/
+		}
+		retVal = append(retVal, sd)
+		iter = uintptr(unsafe.Pointer(iter + unsafe.Sizeof(sizeTest)))
+	}
+	usrNetApiBufferFree.Call(dataPointer)
+	return retVal, nil
 }
 
 func ListLoggedInUsers() ([]so.SessionDetails, error) {
