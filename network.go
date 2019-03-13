@@ -1,6 +1,6 @@
 // +build windows
 
-package win64api
+package winapi
 
 import (
 	"fmt"
