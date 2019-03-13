@@ -59,7 +59,7 @@ func ListNetworkShares() ([]so.NetworkShare, error) {
 			Path:        UTF16toString(data.Shi2_path),
 		}
 		retVal = append(retVal, sd)
-		iter = uinntptr(unsafe.Pointner(iter + unsafe.Sizeof(sizeTest)))
+		iter = uintptr(unsafe.Pointer(iter + unsafe.Sizeof(sizeTest)))
 	}
 	usrNetApiBufferFree.Call(dataPointer)
 	return retVal, nil
