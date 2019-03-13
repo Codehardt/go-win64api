@@ -89,13 +89,12 @@ func ListNetworkSessions() ([]so.NetworkSession, error) {
 		var data = (*SESSION_INFO_2)(unsafe.Pointer(iter))
 		sd := so.NetworkSession{
 			Clientname: UTF16toString(data.Shi2_cname),
-			Username: UTF16toString(data.Sesi2_username),
-			NumOpens: data.Sesi2_num_opens,
-			Time: time.Duration(data.Sesi2_time) * time.Second,
-			IdleTime: time.Duration(data.Sesi2_idle_time) * time.Second,
-			UserFlags: data.Sesi2_user_flags,
+			Username:   UTF16toString(data.Sesi2_username),
+			NumOpens:   data.Sesi2_num_opens,
+			Time:       time.Duration(data.Sesi2_time) * time.Second,
+			IdleTime:   time.Duration(data.Sesi2_idle_time) * time.Second,
+			UserFlags:  data.Sesi2_user_flags,
 			ClientType: UTF16toString(data.Sesi2_cltype_name),
-			*/
 		}
 		retVal = append(retVal, sd)
 		iter = uintptr(unsafe.Pointer(iter + unsafe.Sizeof(sizeTest)))
