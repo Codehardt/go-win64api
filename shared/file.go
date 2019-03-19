@@ -1,6 +1,6 @@
 package shared
 
-type NetworkFile struct {
+type OpenFile struct {
 	ID          uint32
 	Permissions uint32
 	NumLocks    uint32
