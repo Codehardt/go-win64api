@@ -1,3 +1,5 @@
+//+build windows
+
 package win64api
 
 import (
