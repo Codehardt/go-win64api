@@ -40,13 +40,15 @@ func GetInfo() (so.Info, error) {
 		return so.Info{}, fmt.Errorf("null pointer while fetching entry")
 	}
 	var data = (*WKSTA_INFO_100)(unsafe.Pointer(dataPointer))
-	return so.Info{
+	inf := so.Info{
 		PlatformID:   data.Wki100_platform_id,
 		ComputerName: UTF16toString(data.Wki100_computername),
 		LanGroup:     UTF16toString(data.Wki100_langroup),
 		VerMajor:     data.Wki100_ver_major,
 		VerMinor:     data.Wki100_ver_minor,
-	}, nil
+	}
+	usrNetApiBufferFree.Call(dataPointer)
+	return inf, nil
 }
 
 func GetSystemProfile() (so.Hardware, so.OperatingSystem, so.Memory, []so.Disk, []so.Network, error) {

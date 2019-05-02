@@ -23,6 +23,8 @@ var (
 	usrNetLocalGroupAddMembers = modNetapi32.NewProc("NetLocalGroupAddMembers")
 	usrNetLocalGroupDelMembers = modNetapi32.NewProc("NetLocalGroupDelMembers")
 	usrNetApiBufferFree        = modNetapi32.NewProc("NetApiBufferFree")
+	usrNetWkstaUserEnum        = modNetapi32.NewProc("NetWkstaUserEnum")
+	usrNetWkstaUserGetInfo     = modNetapi32.NewProc("NetWkstaUserGetInfo")
 )
 
 const (
@@ -305,6 +307,52 @@ func IsDomainUserAdmin(username string, domain string) (bool, error) {
 	} else {
 		return false, nil
 	}
+}
+
+type WKSTA_USER_INFO_1 struct {
+	Wkui1_username     *uint16
+	Wkui1_logon_domain *uint16
+	Wkui1_oth_domain   *uint16
+	Wkui1_logon_server *uint16
+}
+
+func ListLoggedInUsersWksta() ([]so.UserInfoWksta, error) {
+	var (
+		dataPointer  uintptr
+		resumeHandle uintptr
+		entriesRead  uint32
+		entriesTotal uint32
+		sizeTest     WKSTA_USER_INFO_1
+		retVal       = make([]so.UserInfoWksta, 0)
+	)
+	ret, _, _ := usrNetWkstaUserGetInfo.Call(
+		uintptr(0),
+		uintptr(uint32(1)), // WKSTA_USER_INFO_1
+		uintptr(unsafe.Pointer(&dataPointer)),
+		uintptr(uint32(USER_MAX_PREFERRED_LENGTH)),
+		uintptr(unsafe.Pointer(&entriesRead)),
+		uintptr(unsafe.Pointer(&entriesTotal)),
+		uintptr(unsafe.Pointer(&resumeHandle)),
+	)
+	if ret != NET_API_STATUS_NERR_Success {
+		return nil, fmt.Errorf("error fetching user entry")
+	} else if dataPointer == uintptr(0) {
+		return nil, fmt.Errorf("null pointer while fetching entry")
+	}
+	var iter = dataPointer
+	for i := uint32(0); i < entriesRead; i++ {
+		var data = (*WKSTA_USER_INFO_1)(unsafe.Pointer(iter))
+		ud := so.UserInfoWksta{
+			Username:    UTF16toString(data.Wkui1_username),
+			LogonDomain: UTF16toString(data.Wkui1_oth_domain),
+			OthDomains:  UTF16toString(data.Wkui1_oth_domain),
+			LogonServer: UTF16toString(data.Wkui1_logon_server),
+		}
+		retVal = append(retVal, ud)
+		iter = uintptr(unsafe.Pointer(iter + unsafe.Sizeof(sizeTest)))
+	}
+	usrNetApiBufferFree.Call(dataPointer)
+	return retVal, nil
 }
 
 // ListLocalUsers lists information about local user accounts.

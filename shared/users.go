@@ -17,3 +17,10 @@ type LocalUser struct {
 	BadPasswordCount     uint32        `json:"badPasswordCount"`
 	NumberOfLogons       uint32        `json:"numberOfLogons"`
 }
+
+type UserInfoWksta struct {
+	Username    string
+	LogonDomain string
+	OthDomains  string
+	LogonServer string
+}
