@@ -17,7 +17,7 @@ import (
 	so "github.com/Codehardt/go-win64api/shared"
 )
 
-var siNetWkstaGetInfo = modNetapi32.NetProc("NetWkstaGetInfo")
+var siNetWkstaGetInfo = modNetapi32.NewProc("NetWkstaGetInfo")
 
 type WKSTA_INFO_100 struct {
 	Wki100_platform_id  uint32
