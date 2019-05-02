@@ -143,13 +143,17 @@ func ListLoggedInUsers() ([]so.SessionDetails, error) {
 							if uok, isAdmin := luidinmap(&data.LogonId, &PidLUIDList); uok {
 								uList = append(uList, sUser)
 								ud := so.SessionDetails{
-									Username:      strings.ToLower(LsatoString(data.UserName)),
-									Domain:        strLogonDomain,
-									LocalAdmin:    isAdmin,
-									LogonType:     data.LogonType,
-									DnsDomainName: LsatoString(data.DnsDomainName),
-									LogonTime:     uint64TimestampToTime(data.LogonTime),
+									Username:              LsatoString(data.UserName),
+									Domain:                strLogonDomain,
+									LocalAdmin:            isAdmin,
+									LogonType:             data.LogonType,
+									DnsDomainName:         LsatoString(data.DnsDomainName),
+									LogonTime:             uint64TimestampToTime(data.LogonTime),
+									AuthenticationPackage: LsatoString(data.AuthenticationPackage),
+									LogonServer:           LsatoString(data.LogonServer),
+									LogonId:               fmt.Sprintf("%x%x", data.LogonId.HighPart, data.LogonId.LowPart),
 								}
+
 								hn, _ := os.Hostname()
 								if strings.ToUpper(ud.Domain) == strings.ToUpper(hn) {
 									ud.LocalUser = true

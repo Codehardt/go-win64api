@@ -12,13 +12,16 @@ const (
 )
 
 type SessionDetails struct {
-	Username      string    `json:"username"`
-	Domain        string    `json:"domain"`
-	LocalUser     bool      `json:"isLocal"`
-	LocalAdmin    bool      `json:"isAdmin"`
-	LogonType     uint32    `json:"logonType"`
-	LogonTime     time.Time `json:"logonTime"`
-	DnsDomainName string    `json:"dnsDomainName"`
+	Username              string    `json:"username"`
+	Domain                string    `json:"domain"`
+	LogonId               string    `json:"logonId"`
+	LocalUser             bool      `json:"isLocal"`
+	LocalAdmin            bool      `json:"isAdmin"`
+	LogonType             uint32    `json:"logonType"`
+	LogonTime             time.Time `json:"logonTime"`
+	DnsDomainName         string    `json:"dnsDomainName"`
+	AuthenticationPackage string    `json:"authenticationPackage"`
+	LogonServer           string    `json:"logonServer"`
 }
 
 type NetworkSession struct {
