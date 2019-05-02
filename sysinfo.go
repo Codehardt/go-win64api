@@ -9,12 +9,45 @@ import (
 	"strconv"
 	"strings"
 	"time"
+	"unsafe"
 
 	ole "github.com/go-ole/go-ole"
 	"github.com/go-ole/go-ole/oleutil"
 
 	so "github.com/Codehardt/go-win64api/shared"
 )
+
+var siNetWkstaGetInfo = modNetapi32.NetProc("NetWkstaGetInfo")
+
+type WKSTA_INFO_100 struct {
+	Wki100_platform_id  uint32
+	Wki100_computername *uint16
+	Wki100_langroup     *uint16
+	Wki100_ver_major    uint32
+	Wki100_ver_minor    uint32
+}
+
+func GetInfo() (so.Info, error) {
+	var dataPointer uintptr
+	ret, _, _ := siNetWkstaGetInfo.Call(
+		uintptr(0),
+		uintptr(uint32(100)), // WKSTA_INFO_100
+		uintptr(unsafe.Pointer(&dataPointer)),
+	)
+	if ret != NET_API_STATUS_NERR_Success {
+		return so.Info{}, fmt.Errorf("error fetching info")
+	} else if dataPointer == uintptr(0) {
+		return so.Info{}, fmt.Errorf("null pointer while fetching entry")
+	}
+	var data = (*WKSTA_INFO_100)(unsafe.Pointer(dataPointer))
+	return so.Info{
+		PlatformID:   data.Wki100_platform_id,
+		ComputerName: UTF16toString(data.Wki100_computername),
+		LanGroup:     UTF16toString(data.Wki100_langroup),
+		VerMajor:     data.Wki100_ver_major,
+		VerMinor:     data.Wki100_ver_minor,
+	}, nil
+}
 
 func GetSystemProfile() (so.Hardware, so.OperatingSystem, so.Memory, []so.Disk, []so.Network, error) {
 	ole.CoInitialize(0)

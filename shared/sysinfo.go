@@ -62,3 +62,11 @@ type Network struct {
 	IPAddressCIDR []string `json:"IPAddresses"`
 	DHCPEnabled   bool     `json:"DHCPEnabled"`
 }
+
+type Info struct {
+	PlatformID   uint32
+	ComputerName string
+	LanGroup     string
+	VerMajor     uint32
+	VerMinor     uint32
+}
