@@ -44,7 +44,7 @@ func ListOpenFiles() ([]so.OpenFile, error) {
 	if ret != NET_API_STATUS_NERR_Success {
 		return nil, fmt.Errorf("error fetching open files")
 	} else if dataPointer == uintptr(0) {
-		return nil, fmt.Errorf("null poinnter while fetching entry")
+		return nil, nil
 	}
 	var iter = dataPointer
 	for i := uint32(0); i < entriesRead; i++ {
