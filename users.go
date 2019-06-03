@@ -24,7 +24,6 @@ var (
 	usrNetLocalGroupDelMembers = modNetapi32.NewProc("NetLocalGroupDelMembers")
 	usrNetApiBufferFree        = modNetapi32.NewProc("NetApiBufferFree")
 	usrNetWkstaUserEnum        = modNetapi32.NewProc("NetWkstaUserEnum")
-	usrNetWkstaUserGetInfo     = modNetapi32.NewProc("NetWkstaUserGetInfo")
 )
 
 const (
@@ -325,7 +324,7 @@ func ListLoggedInUsersWksta() ([]so.UserInfoWksta, error) {
 		sizeTest     WKSTA_USER_INFO_1
 		retVal       = make([]so.UserInfoWksta, 0)
 	)
-	ret, _, _ := usrNetWkstaUserGetInfo.Call(
+	ret, _, _ := usrNetWkstaUserEnum.Call(
 		uintptr(0),
 		uintptr(uint32(1)), // WKSTA_USER_INFO_1
 		uintptr(unsafe.Pointer(&dataPointer)),
