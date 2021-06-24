@@ -356,6 +356,15 @@ func ListLoggedInUsersWksta() ([]so.UserInfoWksta, error) {
 
 // ListLocalUsers lists information about local user accounts.
 func ListLocalUsers() ([]so.LocalUser, error) {
+	return listLocalUsers(USER_MAX_PREFERRED_LENGTH)
+}
+
+// ListLocalUsersMax lists information about local user accounts. If there are more than maxCount users, the function will return an error instead.
+func ListLocalUsersMax(maxCount uint32) ([]so.LocalUser, error) {
+	return listLocalUsers(maxCount * uint32(unsafe.Sizeof(USER_INFO_2{})))
+}
+
+func listLocalUsers(maxLength uint32) ([]so.LocalUser, error) {
 	var (
 		dataPointer  uintptr
 		resumeHandle uintptr
@@ -370,7 +379,7 @@ func ListLocalUsers() ([]so.LocalUser, error) {
 		uintptr(uint32(2)), // level, USER_INFO_2
 		uintptr(uint32(USER_FILTER_NORMAL_ACCOUNT)), // filter, only "normal" accounts.
 		uintptr(unsafe.Pointer(&dataPointer)),       // struct buffer for output data.
-		uintptr(uint32(USER_MAX_PREFERRED_LENGTH)),  // allow as much memory as required.
+		uintptr(maxLength),                          // allow as much memory as required.
 		uintptr(unsafe.Pointer(&entriesRead)),
 		uintptr(unsafe.Pointer(&entriesTotal)),
 		uintptr(unsafe.Pointer(&resumeHandle)),
